@@ -17,10 +17,8 @@ function App() {
     }
   }, []);
 
+  // create a wallet and store in local storage
   const createWallet = async () => {
-    // let defaultProvider = ethers.getDefaultProvider("rinkeby");
-    // await setProvider(defaultProvider);
-
     let randomWallet = ethers.Wallet.createRandom();
     let privateKey = randomWallet.signingKey.privateKey;
     let walletWithProvider = new ethers.Wallet(privateKey, provider);
@@ -31,16 +29,15 @@ function App() {
     let balance = await provider.getBalance(
       walletWithProvider.signingKey.address
     );
-    let etherString = await ethers.utils.formatEther(balance);
+    let etherString = ethers.utils.formatEther(balance);
     setBalance(etherString);
 
-    // Put wallet in local storage
+    // store wallet in local storage
     localStorage.setItem("kuiper-wallet", JSON.stringify(walletWithProvider));
   };
 
+  // retrieve wallet from local storage
   const retrieveWallet = async () => {
-    // let defaultProvider = ethers.getDefaultProvider("rinkeby");
-    // await setProvider(defaultProvider);
     // retrieve wallet as json
     let jsonWalletWithProvider = localStorage.getItem("kuiper-wallet");
     let walletWithProvider = JSON.parse(jsonWalletWithProvider);
@@ -51,7 +48,7 @@ function App() {
     let balance = await provider.getBalance(
       walletWithProvider.signingKey.address
     );
-    let etherString = await ethers.utils.formatEther(balance);
+    let etherString = ethers.utils.formatEther(balance);
     setBalance(etherString);
   };
 
