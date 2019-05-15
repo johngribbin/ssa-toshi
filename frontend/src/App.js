@@ -1,62 +1,149 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { Component } from "react";
 import Header from "./components/Header";
+import NewObservationForm from "./components/NewObservationForm";
+import PromoteAmateurForm from "./components/PromoteAmateurForm";
+import Observations from "./components/Observations";
 import { ethers } from "ethers";
+import abi from "./kuiperDatabaseAbi";
+const contractAddress = "0xBE05D42Cc94a9D80354829ac1686e8123c6ab2Fd";
 let provider = ethers.getDefaultProvider("rinkeby");
+let contract = new ethers.Contract(contractAddress, abi, provider);
 
-function App() {
-  const [wallet, setWallet] = useState("");
-  const [address, setAddress] = useState("");
-  const [balance, setBalance] = useState("");
+class App extends Component {
+  state = {
+    wallet: {},
+    address: "",
+    balance: "",
+    contractWithSigner: {},
+    isExpert: false,
+    observations: [],
+    expertCount: ""
+  };
 
-  // acts as component did mount
-  useEffect(() => {
-    if (localStorage.getItem("kuiper-wallet")) {
-      retrieveWallet();
+  async componentDidMount() {
+    if (localStorage.getItem("ssa-private-key")) {
+      await this.retrieveWallet();
+      await this.loadContractState();
     } else {
-      createWallet();
+      await this.createWallet();
+      await this.loadContractState();
     }
-  }, []);
+  }
 
   // create a wallet and store in local storage
-  const createWallet = async () => {
+  createWallet = async () => {
+    // create new wallet and obtain private key
     let randomWallet = ethers.Wallet.createRandom();
+    console.log(randomWallet.mnemonic); // used to add mnemonic to truffle config for deployment
     let privateKey = randomWallet.signingKey.privateKey;
+    // add private key to local storage
+    localStorage.setItem("ssa-private-key", privateKey);
+    // create wallet with provider
     let walletWithProvider = new ethers.Wallet(privateKey, provider);
-    //add wallet to app state
-    setWallet(walletWithProvider);
-    setAddress(walletWithProvider.signingKey.address);
 
+    // get balance of wallet
     let balance = await provider.getBalance(
       walletWithProvider.signingKey.address
     );
     let etherString = ethers.utils.formatEther(balance);
-    setBalance(etherString);
-
-    // store wallet in local storage
-    localStorage.setItem("kuiper-wallet", JSON.stringify(walletWithProvider));
+    // add wallet and wallet info to app state
+    this.setState({
+      wallet: walletWithProvider,
+      address: walletWithProvider.signingKey.address,
+      balance: etherString
+    });
   };
 
   // retrieve wallet from local storage
-  const retrieveWallet = async () => {
-    // retrieve wallet as json
-    let jsonWalletWithProvider = localStorage.getItem("kuiper-wallet");
-    let walletWithProvider = JSON.parse(jsonWalletWithProvider);
-    //add wallet to app state
-    setWallet(walletWithProvider);
-    setAddress(walletWithProvider.signingKey.address);
+  retrieveWallet = async () => {
+    // retrieve private key from local storage
+    let privateKey = localStorage.getItem("ssa-private-key");
+
+    let walletWithProvider = new ethers.Wallet(privateKey, provider);
 
     let balance = await provider.getBalance(
       walletWithProvider.signingKey.address
     );
+
     let etherString = ethers.utils.formatEther(balance);
-    setBalance(etherString);
+    // add wallet and wallet info to app state
+    this.setState({
+      wallet: walletWithProvider,
+      address: walletWithProvider.signingKey.address,
+      balance: etherString
+    });
   };
 
-  return (
-    <section className="app__wrapper">
-      <Header address={address} balance={balance} />
-    </section>
-  );
+  loadContractState = async () => {
+    let contractWithSigner = contract.connect(this.state.wallet);
+    this.setState({ contractWithSigner });
+
+    let isExpert = await contractWithSigner.isExpert(this.state.address);
+    this.setState({ isExpert });
+
+    let observationCount = await contractWithSigner.getObservationCount();
+    let observations = [];
+    for (let i = 0; i <= observationCount; i++) {
+      let observation = await contractWithSigner.getObservation(i);
+      observations.push({ ...observation, observationId: i });
+    }
+
+    this.setState({ observations });
+
+    let expertCount = await contractWithSigner.getExpertCount();
+    this.setState({ expertCount: Number(expertCount) });
+
+    // update balance of wallet
+    let balance = await provider.getBalance(
+      this.state.wallet.signingKey.address
+    );
+    let etherString = ethers.utils.formatEther(balance);
+    // add wallet and wallet info to app state
+    this.setState({
+      balance: etherString
+    });
+  };
+
+  render() {
+    const {
+      address,
+      balance,
+      contractWithSigner,
+      isExpert,
+      expertCount,
+      observations
+    } = this.state;
+
+    const { loadContractState } = this;
+
+    return (
+      <section className="app__wrapper">
+        <Header
+          contractAddress={contractAddress}
+          address={address}
+          balance={balance}
+        />
+        {isExpert ? (
+          <div className="expert-functions__wrapper">
+            <NewObservationForm
+              contractWithSigner={contractWithSigner}
+              loadContractState={loadContractState}
+            />
+            <p style={{ alignSelf: "center" }}>
+              You are 1 of {expertCount} experts!
+            </p>
+            <PromoteAmateurForm contractWithSigner={contractWithSigner} />
+          </div>
+        ) : null}
+        <Observations
+          address={address}
+          contractWithSigner={contractWithSigner}
+          observations={observations}
+          loadContractState={loadContractState}
+        />
+      </section>
+    );
+  }
 }
 
 export default App;

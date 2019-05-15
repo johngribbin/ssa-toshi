@@ -4,7 +4,6 @@ contract KuiperDatabase {
   event NewObservation(address indexed _expert, uint indexed _observationId);
   event NewConfirmation(address indexed _observer, uint indexed _observationId);
 
-
   address public owner;
   address[] public expertAccounts; // maintains a record of all experts
   mapping(address => bool) public isExpert; // used to restrict functions to use by experts
@@ -13,7 +12,7 @@ contract KuiperDatabase {
 
   struct Observation {
     address expert;
-    bytes32 url;
+    string url;
     address[] confirmations; // addresses of those who "confirm" the observation
   }
   mapping(uint => Observation) observations;
@@ -28,7 +27,7 @@ contract KuiperDatabase {
     if (msg.sender == owner) _;
   }
 
-  function addNewObservation(bytes32 _url) public {
+  function addNewObservation(string memory _url) public {
     require(isExpert[msg.sender], "Sender is not an expert");
     observationNonce += 1;
     Observation storage newObservation = observations[observationNonce];
@@ -54,15 +53,24 @@ contract KuiperDatabase {
     return observationNonce;
   }
 
-  function getObservation(uint _observationId) public view returns (address expert, bytes32 url, address[] memory confirmations) {
+  function getObservation(uint _observationId) public view returns (address expert, string memory url, address[] memory confirmations) {
     Observation storage observation = observations[_observationId];
 
     return (observation.expert, observation.url, observation.confirmations);
   }
 
-  function graduateAmateur(address _amateur) public {
+  function getExpertCount() public view returns (uint) {
+    return expertAccounts.length;
+  }
+
+  function getExpertAddress(uint _index) public view returns (address) {
+    return expertAccounts[_index];
+  }
+
+  function promoteAmateur(address _amateur) public {
     require(confirmationCount[_amateur] >= 3, "Amatuer does not have at least 3 confirmed conservations");
     // add the amatrus address to the expert accounts array
     expertAccounts.push(_amateur);
+    isExpert[_amateur] = true;
   }
 }

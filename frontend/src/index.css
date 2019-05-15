@@ -91,10 +91,17 @@ code {
     monospace;
 }
 
+@import url("https://fonts.googleapis.com/css?family=VT323");
+
 /* ----------
 app
 ---------- */
 .app__wrapper {
+  background: black;
+  color: #20c20e;
+  font-family: "VT323", monospace;
+  font-size: 1.2em;
+  height: 100vh;
 }
 
 /* ----------
@@ -102,7 +109,9 @@ Header
 ---------- */
 .header__wrapper {
   align-items: center;
+  background: black;
   border: 1px solid black;
+  color: #20c20e;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -112,4 +121,100 @@ Header
 .header__header {
   font-size: 1.2em;
   font-weight: bold;
+}
+
+.header__copy {
+  margin-top: 0.5em;
+}
+
+/* ----------
+Expert Functions
+---------- */
+.expert-functions__wrapper {
+  border: 2px dashed grey;
+  display: flex;
+  justify-content: space-around;
+  margin: 0em 1em 3em 1em;
+  padding-bottom: 1em;
+}
+
+/* ----------
+ObservationForm
+---------- */
+.observation-form__wrapper {
+  margin-top: 1em;
+}
+
+.observation-form__form {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.observation-form__header {
+  margin-bottom: 0.5em;
+}
+
+.observation-form__label {
+  margin-bottom: 0.5em;
+}
+
+.observation-form__input {
+  margin-bottom: 0.5em;
+}
+
+.observation-form__button {
+  background: grey;
+  color: #20c20e;
+  padding: 0.5em;
+}
+
+.observation-form__button:hover {
+  cursor: pointer;
+}
+
+/* ----------
+Observations 
+---------- */
+.observations__wrapper {
+  background: black;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 1em;
+  padding: 0.5em;
+}
+
+/* ----------
+Observation
+---------- */
+.observation__wrapper {
+  align-items: center;
+  border: 1px solid #20c20e;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
+}
+
+.observation__image-container {
+  margin: 0.5em;
+}
+
+.observation__image {
+  object-fit: cover;
+  width: 350px;
+  height: 350px;
+}
+
+.observation__confirm-button {
+  background: grey;
+  color: #20c20e;
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;
+  padding: 0.5em;
+}
+
+.observation__confirm-button:hover {
+  cursor: pointer;
 }

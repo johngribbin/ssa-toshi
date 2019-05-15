@@ -1,0 +1,4 @@
+- add red borders to observations that do not have any confirmations.
+- consider a colored scale to reflect the 6 levels of accuracy that chris proposed
+- consider a leader board of well performing amateurs for consideration to be promoted
+- display a table of experts and their performance.
