@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Header from "./components/Header";
 import NewObservationForm from "./components/NewObservationForm";
 import PromoteAmateurForm from "./components/PromoteAmateurForm";
+import AmateurLeaderboard from "./components/AmateurLeaderboard";
 import Observations from "./components/Observations";
 import { ethers } from "ethers";
 import abi from "./kuiperDatabaseAbi";
@@ -17,7 +18,8 @@ class App extends Component {
     contractWithSigner: {},
     isExpert: false,
     observations: [],
-    expertCount: ""
+    expertCount: "",
+    confirmationCounts: []
   };
 
   async componentDidMount() {
@@ -102,6 +104,41 @@ class App extends Component {
     this.setState({
       balance: etherString
     });
+
+    this.getConfirmationCounts();
+  };
+
+  getConfirmationCounts = async () => {
+    let { observations, contractWithSigner } = this.state;
+
+    let allConfirmationAddresses = [];
+
+    observations.map(observation => {
+      observation.confirmations.map(address =>
+        allConfirmationAddresses.push(address)
+      );
+    });
+
+    let uniqueAddresses = [
+      ...new Set(allConfirmationAddresses.map(item => item))
+    ];
+
+    let confirmationCounts = [];
+
+    await Promise.all(
+      uniqueAddresses.map(async address => {
+        let isExpert = await contractWithSigner.isExpert(address);
+        // only push amateurs as confirmation counts is used to redner the amateur leaderboard
+        if (!isExpert) {
+          let confirmationCount = await contractWithSigner.confirmationCount(
+            address
+          );
+          confirmationCounts.push({ [address]: Number(confirmationCount) });
+        }
+      })
+    );
+
+    this.setState({ confirmationCounts });
   };
 
   render() {
@@ -111,7 +148,8 @@ class App extends Component {
       contractWithSigner,
       isExpert,
       expertCount,
-      observations
+      observations,
+      confirmationCounts
     } = this.state;
 
     const { loadContractState } = this;
@@ -135,6 +173,10 @@ class App extends Component {
             <PromoteAmateurForm contractWithSigner={contractWithSigner} />
           </div>
         ) : null}
+        <AmateurLeaderboard
+          confirmationCounts={confirmationCounts}
+          contractWithSigner={contractWithSigner}
+        />
         <Observations
           address={address}
           contractWithSigner={contractWithSigner}

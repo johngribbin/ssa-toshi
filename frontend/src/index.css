@@ -131,10 +131,10 @@ Header
 Expert Functions
 ---------- */
 .expert-functions__wrapper {
-  border: 2px dashed grey;
+  border: 2px dashed #20c20e;
   display: flex;
   justify-content: space-around;
-  margin: 0em 1em 3em 1em;
+  margin: 0em 1em 2em 1em;
   padding-bottom: 1em;
 }
 
@@ -175,6 +175,27 @@ ObservationForm
 }
 
 /* ----------
+Amateur Leaderboard
+---------- */
+.amateur-leaderboard__wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2em;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+table,
+th,
+td {
+  padding: 5px;
+  border: 1px solid #20c20e;
+  text-align: center;
+}
+
+/* ----------
 Observations 
 ---------- */
 .observations__wrapper {
@@ -191,7 +212,6 @@ Observation
 ---------- */
 .observation__wrapper {
   align-items: center;
-  border: 1px solid #20c20e;
   display: flex;
   flex-direction: column;
   margin-bottom: 1em;
