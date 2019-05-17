@@ -15,19 +15,11 @@ export default function NewObservationForm({
 
       setUrl("");
 
-      let observationCountBefore = await contractWithSigner.getObservationCount();
-
-      console.log(`observation count before = ${observationCountBefore}`);
-
       let tx = await contractWithSigner.addNewObservation(url);
 
       console.log(tx.hash);
 
       await tx.wait();
-
-      let observationCountAfter = await contractWithSigner.getObservationCount();
-
-      console.log(`observation count after = ${observationCountAfter}`);
 
       setIsSubmitting(false);
       loadContractState();

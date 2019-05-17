@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 
-export default function PromoteAmateurForm({ contractWithSigner }) {
+export default function PromoteAmateurForm({
+  contractWithSigner,
+  loadContractState
+}) {
   const [address, setAddress] = useState("");
+  const [isPromoting, setIsPromoting] = useState(false);
 
   const graduateAmateur = async address => {
     if (!address) {
       alert("Please enter a valid ethereum address!");
     } else {
+      setIsPromoting(true);
+
       let tx = await contractWithSigner.promoteAmateur(address);
 
       setAddress("");
@@ -16,6 +22,9 @@ export default function PromoteAmateurForm({ contractWithSigner }) {
       await tx.wait();
 
       alert(`${address} is now an expert!`);
+
+      setIsPromoting(false);
+      loadContractState();
     }
   };
 
@@ -34,12 +43,16 @@ export default function PromoteAmateurForm({ contractWithSigner }) {
             onChange={event => setAddress(event.target.value)}
           />
         </label>
-        <div
-          className="observation-form__button"
-          onClick={() => graduateAmateur(address)}
-        >
-          Submit Amateur
-        </div>
+        {isPromoting ? (
+          <div>Please Wait...</div>
+        ) : (
+          <div
+            className="observation-form__button"
+            onClick={() => graduateAmateur(address)}
+          >
+            Promote Amateur
+          </div>
+        )}
       </form>
     </section>
   );

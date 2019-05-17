@@ -102,7 +102,7 @@ class App extends Component {
     let etherString = ethers.utils.formatEther(balance);
     // add wallet and wallet info to app state
     this.setState({
-      balance: etherString
+      balance: Number(etherString)
     });
 
     this.getConfirmationCounts();
@@ -170,7 +170,10 @@ class App extends Component {
             <p style={{ alignSelf: "center" }}>
               You are 1 of {expertCount} experts!
             </p>
-            <PromoteAmateurForm contractWithSigner={contractWithSigner} />
+            <PromoteAmateurForm
+              contractWithSigner={contractWithSigner}
+              loadContractState={loadContractState}
+            />
           </div>
         ) : null}
         <AmateurLeaderboard
@@ -179,6 +182,7 @@ class App extends Component {
         />
         <Observations
           address={address}
+          balance={balance}
           contractWithSigner={contractWithSigner}
           observations={observations}
           loadContractState={loadContractState}
